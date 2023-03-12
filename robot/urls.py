@@ -1,9 +1,10 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import ProjectListAPIView, ProjectUpdateAPIView, ProjectDestroyAPIView, ProjectDetailAPIView, ProjectCreateAPIView,RobotListAPIView, RobotCreateAPIView, RobotDestroyAPIView, RobotDetailAPIView, RobotUpdateAPIView, FkCreateAPIView, FkDetailAPIView, IkCreateAPIView, IkDetailAPIView
+from .views import apiOverview, ProjectListAPIView, ProjectUpdateAPIView, ProjectDestroyAPIView, ProjectDetailAPIView, ProjectCreateAPIView,RobotListAPIView, RobotCreateAPIView, RobotDestroyAPIView, RobotDetailAPIView, RobotUpdateAPIView, FkCreateAPIView, FkDetailAPIView, IkCreateAPIView, IkDetailAPIView
 
 urlpatterns = [
+    path('', apiOverview, name="api-overview"),
     path('project-list/', ProjectListAPIView.as_view(), name='project-list'),
     path('project-create/', ProjectCreateAPIView.as_view(), name='project-create'),
     path('project-detail/<int:pk>', ProjectDetailAPIView.as_view(), name='project-detail'),
