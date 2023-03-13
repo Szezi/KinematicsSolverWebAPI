@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import Project, Robot, ForwardKinematics, InverseKinematics
 from .serializers import ProjectSerializer, RobotSerializer, FkSerializer, IkSerializer
@@ -33,21 +34,29 @@ def apiOverview(request):
 
 
 class ProjectListAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
 
 class ProjectCreateAPIView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
 
 class ProjectDetailAPIView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
 
 class ProjectUpdateAPIView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     lookup_field = 'pk'
@@ -59,6 +68,8 @@ class ProjectUpdateAPIView(generics.RetrieveUpdateAPIView):
 
 
 class ProjectDestroyAPIView(generics.RetrieveDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     lookup_field = 'pk'
@@ -69,21 +80,29 @@ class ProjectDestroyAPIView(generics.RetrieveDestroyAPIView):
 
 
 class RobotListAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
 
 
 class RobotCreateAPIView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
 
 
 class RobotDetailAPIView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
 
 
 class RobotUpdateAPIView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
     lookup_field = 'pk'
@@ -95,6 +114,8 @@ class RobotUpdateAPIView(generics.RetrieveUpdateAPIView):
 
 
 class RobotDestroyAPIView(generics.RetrieveDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
     lookup_field = 'pk'
@@ -105,11 +126,15 @@ class RobotDestroyAPIView(generics.RetrieveDestroyAPIView):
 
 
 class FkCreateAPIView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = ForwardKinematics.objects.all()
     serializer_class = FkSerializer
 
 
 class FkDetailAPIView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = ForwardKinematics.objects.all()
     serializer_class = FkSerializer
     lookup_field = 'pk'
@@ -121,11 +146,15 @@ class FkDetailAPIView(generics.RetrieveUpdateAPIView):
 
 
 class IkCreateAPIView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = InverseKinematics.objects.all()
     serializer_class = IkSerializer
 
 
 class IkDetailAPIView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = InverseKinematics.objects.all()
     serializer_class = IkSerializer
     lookup_field = 'pk'

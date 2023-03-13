@@ -78,11 +78,15 @@ class ChangePasswordAPIView(generics.UpdateAPIView):
 
 
 class UserDetailAPIView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
 class UserUpdateAPIView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'pk'
