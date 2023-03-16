@@ -9,7 +9,7 @@ from .serializers import ProjectRobotsSerializer, ProjectSerializer, RobotSerial
 
 
 @api_view(['GET'])
-def apiOverview(request):
+def robotOverview(request):
     api_urls = {
         'Project List': reverse('project-list', request=request),
         'Project Detail': 'robot/project-detail/<str:pk>/',
