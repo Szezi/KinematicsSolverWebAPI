@@ -25,7 +25,7 @@ class Project(models.Model):
 
 
 class Robot(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=False)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='robots', null=False)
     name = models.CharField(default='New robot', max_length=50)
     description = models.CharField(max_length=100, null=True, blank=True, default='Robot description')
     notes = models.TextField(null=True, blank=True)
@@ -58,7 +58,7 @@ class Robot(models.Model):
 
 
 class ForwardKinematics(models.Model):
-    Robot = models.OneToOneField(Robot, on_delete=models.CASCADE, null=False)
+    Robot = models.OneToOneField(Robot, on_delete=models.CASCADE, related_name='fk_calc', null=False)
     name = models.CharField(default='FK Calculation', max_length=50)
     notes = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -82,7 +82,7 @@ class ForwardKinematics(models.Model):
 
 
 class InverseKinematics(models.Model):
-    Robot = models.OneToOneField(Robot, on_delete=models.CASCADE, null=False)
+    Robot = models.OneToOneField(Robot, on_delete=models.CASCADE, related_name='ik_calc', null=False)
     name = models.CharField(default='IK Calculation', max_length=50)
     notes = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
