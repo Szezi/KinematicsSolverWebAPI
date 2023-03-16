@@ -1,11 +1,11 @@
-from rest_framework import generics
+from rest_framework import generics, request
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import Project, Robot, ForwardKinematics, InverseKinematics
-from .serializers import ProjectSerializer, RobotSerializer, FkSerializer, IkSerializer
+from .serializers import ProjectRobotsSerializer, ProjectSerializer, RobotSerializer, FkSerializer, IkSerializer, RobotsCalculationsSerializer
 
 
 @api_view(['GET'])
@@ -35,9 +35,16 @@ def apiOverview(request):
 
 class ProjectListAPIView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
-
-    queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the projects
+        for the currently authenticated user.
+        """
+        user = self.request.user
+        queryset = Project.objects.filter(members=user)
+        return queryset
 
 
 class ProjectCreateAPIView(generics.CreateAPIView):
@@ -50,8 +57,16 @@ class ProjectCreateAPIView(generics.CreateAPIView):
 class ProjectDetailAPIView(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
+    serializer_class = ProjectRobotsSerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the projects
+        for the currently authenticated user.
+        """
+        user = self.request.user
+        queryset = Project.objects.all()
+        return queryset
 
 
 class ProjectUpdateAPIView(generics.RetrieveUpdateAPIView):
@@ -81,9 +96,16 @@ class ProjectDestroyAPIView(generics.RetrieveDestroyAPIView):
 
 class RobotListAPIView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
-
-    queryset = Robot.objects.all()
     serializer_class = RobotSerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the projects
+        for the currently authenticated user.
+        """
+        user = self.request.user
+        queryset = Robot.objects.filter(owner=user)
+        return queryset
 
 
 class RobotCreateAPIView(generics.CreateAPIView):
@@ -97,7 +119,7 @@ class RobotDetailAPIView(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
     queryset = Robot.objects.all()
-    serializer_class = RobotSerializer
+    serializer_class = RobotsCalculationsSerializer
 
 
 class RobotUpdateAPIView(generics.RetrieveUpdateAPIView):
