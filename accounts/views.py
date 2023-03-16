@@ -10,7 +10,7 @@ from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, Ch
 
 
 @api_view(['GET'])
-def apiOverview(request):
+def accountsOverview(request):
     api_urls = {
         'Register': 'accounts/register/',
         'Login': 'accounts/login/',
