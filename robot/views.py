@@ -1,12 +1,14 @@
+import datetime
+
 from rest_framework import generics, request, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from robot.utils import calculate_ik
+from robot.utils import calculate_ik, calculate_fk
 from .models import Project, Robot, ForwardKinematics, InverseKinematics
 from .serializers import ProjectRobotsSerializer, ProjectSerializer, RobotSerializer, FkSerializer, IkSerializer, \
-    RobotsCalculationsSerializer, InverseRobotsSerializer
+    RobotsCalculationsSerializer, InverseRobotsSerializer, ForwardRobotsSerializer
 
 
 @api_view(['GET'])
@@ -149,8 +151,49 @@ class FkDetailAPIView(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
 
     queryset = ForwardKinematics.objects.all()
-    serializer_class = FkSerializer
+    serializer_class = ForwardRobotsSerializer
     lookup_field = 'pk'
+
+    def put(self, request, *args, **kwargs):
+        self.theta1 = float(request.data.get("theta1"))
+        self.theta2 = float(request.data.get("theta2"))
+        self.theta3 = float(request.data.get("theta3"))
+        self.theta4 = float(request.data.get("theta4"))
+        link1 = int(request.data.get("Robot.link1"))
+        link2 = int(request.data.get("Robot.link2"))
+        link3 = int(request.data.get("Robot.link3"))
+        link4 = int(request.data.get("Robot.link4"))
+        link5 = int(request.data.get("Robot.link5"))
+        link1_min = int(request.data.get("Robot.link1_min"))
+        link2_min = int(request.data.get("Robot.link2_min"))
+        link3_min = int(request.data.get("Robot.link3_min"))
+        link4_min = int(request.data.get("Robot.link4_min"))
+        link5_min = int(request.data.get("Robot.link5_min"))
+        link1_max = int(request.data.get("Robot.link1_max"))
+        link2_max = int(request.data.get("Robot.link2_max"))
+        link3_max = int(request.data.get("Robot.link3_max"))
+        link4_max = int(request.data.get("Robot.link4_max"))
+        link5_max = int(request.data.get("Robot.link5_max"))
+        self.links = {
+            "link1": [link1, link1_min, link1_max],
+            "link2": [link2, link2_min, link2_max],
+            "link3": [link3, link3_min, link3_max],
+            "link4": [link4, link4_min, link4_max],
+            "link5": [link5, link5_min, link5_max],
+        }
+
+        result = calculate_fk(self.links, self.theta1, self.theta2, self.theta3, self.theta4)
+        # print(result)
+        request.data._mutable = True
+        request.data['x'] = float(result[0][1][3][0])
+        request.data['y'] = float(result[0][1][3][1])
+        request.data['z'] = float(result[0][1][3][2])
+        request.data['alpha'] = float(result[0][0])
+        request.data['modified'] = datetime.datetime.now()
+        request.data['modified_by'] = self.request.user.pk
+        request.data._mutable = False
+
+        return super(FkDetailAPIView, self).update(request, *args, **kwargs)
 
 
 class IkCreateAPIView(generics.CreateAPIView):
@@ -208,6 +251,8 @@ class IkDetailAPIView(generics.RetrieveUpdateAPIView):
         request.data['theta22'] = result[1][0][1]
         request.data['theta33'] = result[1][0][2]
         request.data['theta44'] = result[1][0][3]
+        request.data['modified'] = datetime.datetime.now()
+        request.data['modified_by'] = self.request.user.pk
         request.data._mutable = False
 
         return super(IkDetailAPIView, self).update(request, *args, **kwargs)
