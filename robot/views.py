@@ -1,11 +1,12 @@
-from rest_framework import generics, request
+from rest_framework import generics, request, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
+from robot.utils import calculate_ik
 from .models import Project, Robot, ForwardKinematics, InverseKinematics
-from .serializers import ProjectRobotsSerializer, ProjectSerializer, RobotSerializer, FkSerializer, IkSerializer, RobotsCalculationsSerializer
+from .serializers import ProjectRobotsSerializer, ProjectSerializer, RobotSerializer, FkSerializer, IkSerializer, \
+    RobotsCalculationsSerializer, InverseRobotsSerializer
 
 
 @api_view(['GET'])
@@ -76,11 +77,6 @@ class ProjectUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = ProjectSerializer
     lookup_field = 'pk'
 
-    def perform_update(self, serializer):
-        instance = serializer.save()
-        if not instance.content:
-            instance.content = instance.title
-
 
 class ProjectDestroyAPIView(generics.RetrieveDestroyAPIView):
     permission_classes = (IsAuthenticated,)
@@ -129,11 +125,6 @@ class RobotUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = RobotSerializer
     lookup_field = 'pk'
 
-    def perform_update(self, serializer):
-        instance = serializer.save()
-        if not instance.content:
-            instance.content = instance.title
-
 
 class RobotDestroyAPIView(generics.RetrieveDestroyAPIView):
     permission_classes = (IsAuthenticated,)
@@ -161,11 +152,6 @@ class FkDetailAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = FkSerializer
     lookup_field = 'pk'
 
-    def perform_update(self, serializer):
-        instance = serializer.save()
-        if not instance.content:
-            instance.content = instance.title
-
 
 class IkCreateAPIView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)
@@ -178,10 +164,51 @@ class IkDetailAPIView(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
 
     queryset = InverseKinematics.objects.all()
-    serializer_class = IkSerializer
+    serializer_class = InverseRobotsSerializer
     lookup_field = 'pk'
 
-    def perform_update(self, serializer):
-        instance = serializer.save()
-        if not instance.content:
-            instance.content = instance.title
+    def put(self, request, *args, **kwargs):
+        self.x = int(request.data.get("x"))
+        self.y = int(request.data.get("y"))
+        self.z = int(request.data.get("z"))
+        self.alpha = int(request.data.get("alpha"))
+        link1 = int(request.data.get("Robot.link1"))
+        link2 = int(request.data.get("Robot.link2"))
+        link3 = int(request.data.get("Robot.link3"))
+        link4 = int(request.data.get("Robot.link4"))
+        link5 = int(request.data.get("Robot.link5"))
+        link1_min = int(request.data.get("Robot.link1_min"))
+        link2_min = int(request.data.get("Robot.link2_min"))
+        link3_min = int(request.data.get("Robot.link3_min"))
+        link4_min = int(request.data.get("Robot.link4_min"))
+        link5_min = int(request.data.get("Robot.link5_min"))
+        link1_max = int(request.data.get("Robot.link1_max"))
+        link2_max = int(request.data.get("Robot.link2_max"))
+        link3_max = int(request.data.get("Robot.link3_max"))
+        link4_max = int(request.data.get("Robot.link4_max"))
+        link5_max = int(request.data.get("Robot.link5_max"))
+        self.links = {
+            "link1": [link1, link1_min, link1_max],
+            "link2": [link2, link2_min, link2_max],
+            "link3": [link3, link3_min, link3_max],
+            "link4": [link4, link4_min, link4_max],
+            "link5": [link5, link5_min, link5_max],
+        }
+        # print(self.links, self.x, self.y, self.y, self.alpha)
+
+        result = calculate_ik(self.links, self.x, self.y, self.z, self.alpha)
+        # print(result)
+
+        request.data._mutable = True
+        request.data['theta1'] = result[0][0][0]
+        request.data['theta2'] = result[0][0][1]
+        request.data['theta3'] = result[0][0][2]
+        request.data['theta4'] = result[0][0][3]
+        request.data['theta11'] = result[1][0][0]
+        request.data['theta22'] = result[1][0][1]
+        request.data['theta33'] = result[1][0][2]
+        request.data['theta44'] = result[1][0][3]
+        request.data._mutable = False
+
+        return super(IkDetailAPIView, self).update(request, *args, **kwargs)
+
