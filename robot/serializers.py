@@ -63,3 +63,25 @@ class InverseRobotsSerializer(serializers.ModelSerializer):
         # Runs the original parent update(), since the nested fields were
         # "popped" out of the data
         return super(InverseRobotsSerializer, self).update(instance, validated_data)
+
+
+class ForwardRobotsSerializer(serializers.ModelSerializer):
+    Robot = RobotSerializer(read_only=False)
+
+    class Meta:
+        model = ForwardKinematics
+        fields = ['name', 'notes', 'created', 'modified', 'modified_by', 'x', 'y', 'z', 'alpha', 'theta1', 'theta2', 'theta3', 'theta4', 'Robot']
+
+    def update(self, instance, validated_data):
+        # CHANGE "userprofile" here to match your one-to-one field name
+        if 'Robot' in validated_data:
+            nested_serializer = self.fields['Robot']
+            nested_instance = instance.Robot
+            nested_data = validated_data.pop('Robot')
+
+            # Runs the update on whatever serializer the nested data belongs to
+            nested_serializer.update(nested_instance, nested_data)
+
+        # Runs the original parent update(), since the nested fields were
+        # "popped" out of the data
+        return super(ForwardRobotsSerializer, self).update(instance, validated_data)
