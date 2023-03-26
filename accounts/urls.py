@@ -10,8 +10,8 @@ urlpatterns = [
     path("logout", LogoutView.as_view(next_page='login'), name='logout'),
     path('register', RegisterUserAPIView.as_view(), name='register'),
     path('change-password', ChangePasswordAPIView.as_view(), name='change-password'),
-    path("detail/<int:pk>", UserDetailAPIView.as_view(), name='detail'),
-    path("update/<int:pk>", UserUpdateAPIView.as_view(), name='update'),
+    path("detail", UserDetailAPIView.as_view(), name='detail'),
+    path("update", UserUpdateAPIView.as_view(), name='update'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
