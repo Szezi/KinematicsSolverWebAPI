@@ -3,6 +3,7 @@ from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.reverse import reverse
 
 from .models import User
 
@@ -12,12 +13,12 @@ from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, Ch
 @api_view(['GET'])
 def accountsOverview(request):
     api_urls = {
-        'Register': 'accounts/register/',
-        'Login': 'accounts/login/',
-        'Logout': 'accounts/logout/',
-        'User Detail': 'accounts/user-detail/<str:pk>/',
-        'User Update': 'accounts/user-update/<str:pk>/',
-        'Change password': 'accounts/change-password/',
+        'Register': reverse('register', request=request),
+        'Login': reverse('login', request=request),
+        'Logout': reverse('logout', request=request),
+        'User Detail': reverse('detail', request=request),
+        'User Update': reverse('update', request=request),
+        'Change password': reverse('change-password', request=request),
     }
 
     return Response(api_urls)
@@ -83,10 +84,17 @@ class UserDetailAPIView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
 
 class UserUpdateAPIView(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    lookup_field = 'pk'
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
