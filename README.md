@@ -129,7 +129,7 @@ Several API views was created to manage users account like:
 ### Dashboard
 
 <div align="center">
-<img src="static\screen\Dashboard.png" alt="dashboard">
+<img src="static\screen\dashboard.png" alt="dashboard">
 </div>
 
 Dashboard API View allows user to keep track with basic information about users projects. 
